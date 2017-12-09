@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+
+"""OpenVPN status parser
+
+Usage:
+    openvpn-status-parser <filename>...
+
+"""
+
+import os.path
+import pprint
+import sys
+
+#import docopt
+import argparse
+import ovpn_status_parser
+#import openvpn_status_parser
+
+
+def main():
+    arg_parser = argparse.ArgumentParser()
+  
+    arg_parser.add_argument('command', choices=['clients-count', 'list-cn'], help='Command to process')
+    arg_parser.add_argument('-f', '--file', required=True, help='OpenVPN status file')
+    arguments = arg_parser.parse_args()
+
+    #arguments = docopt.docopt(__doc__, version='OpenVPN status parser')
+    filename = arguments.file
+    command = arguments.command
+#    for filename in arguments:
+    if not os.path.exists(filename):
+        print("File '%s' does not exist. Exiting." % filename)
+        return 1
+
+    parser = ovpn_status_parser.OpenVPNStatusParser(filename)
+
+    if command == 'clients-count':
+        print len(parser.connected_clients)
+    elif command == 'list-cn':
+        for key,val in parser.connected_clients.iteritems():
+            print key
+
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
